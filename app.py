@@ -41,8 +41,12 @@ class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     qty = db.Column(db.Integer, nullable=False)
     total = db.Column(db.Integer, nullable=False)
+
+   
+
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     cart_items = db.relationship('Cart_item', backref='cart', lazy = True)
+
 
     def __init__(self, qty, total, user_id):
         self.qty = qty
@@ -272,7 +276,8 @@ def order_delete(id):
 
 @app.route('/search/<title>', methods=['GET'])
 def book_search(title):
-    search_book = db.session.query(Book.id, Book.title, Book.author).filter(Book.title == title).first()
+    search_book = db.session.query(Book.id, Book.title, Book.spanish_title, Book.author, Book.cost, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary ).filter(Book.title == title).first()
+
     return jsonify(search_book)
 
   
