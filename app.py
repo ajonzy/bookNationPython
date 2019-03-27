@@ -13,6 +13,19 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 # Classes go here
+class Cart(db.Model):
+    __tablename__ = "cart"
+    id = db.Column(db.Integer, primary_key=True)
+    qty = db.Column(db.Integer, nullable=False)
+    total = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(user.id))
+    cartitems = ('Cart_item', backref='cart', lazy = True)
+
+    def __init__(self, qty, total, user_id):
+        self.qty = qty
+        self.total = total
+        self.user_id = user_id
+
 class Book(db.Model):
     __tablename__ = "book"
     id = db.Column(db.Integer, primary_key=True)
@@ -116,6 +129,40 @@ def user_input():
 def return_all_users():
     all_users = db.session.query(User.id, User.name, User.email, User.password, User.user_type, User.genre_preferences).all()
     return jsonify(all_users)
+
+@app.route('/cart/input', methods = ['POST'])
+def cart_input():
+    if request.content_type == 'application/json':
+       post_data = request.get_json()
+       qty = post_data.get('qty')
+       total = post_data.get('total')
+       user_id = post_data.get("user_id")
+       rec = Cart(qty, total)
+       db.session.add(rec)    
+       db.session.commit()
+       return jsonify("Data Posted")
+
+    return jsonify('Something went wrong')
+
+@app.route('/carts', methods=['GET'])
+def return_carts():
+    all_carts = db.session.query(Cart.id, Cart.qty, Cart.total, Cart.user_id).all()
+    return jsonify(all_carts)
+
+@app.route('/cart/<id>', methods=['GET'])
+def return_single_cart(id):
+    one_cart = db.session.query(Cart.id, Cart.qty, Cart.total, Cart.user_id).filter(Cart.id == id).first()
+    return jsonify(one_cart)
+
+@app.route('/cart/delete/<id>', methods=["DELETE"])
+def cart_delete(id):
+    if request.content_type == 'application/json':
+       
+        record = db.session.query(Cart).get(id)
+        db.session.delete(record)
+        db.session.commit()
+        return jsonify("Completed Delete action")
+    return jsonify("delete failed")
 
 @app.route('/delete/user/<id>', methods=["DELETE"])
 def user_delete(id):
