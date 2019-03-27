@@ -170,6 +170,12 @@ def user_delete(id):
     db.session.delete(record)
     db.session.commit()
     return jsonify('Completed delete user')
+
+
+@app.route('/search/<title>', methods=['GET'])
+def book_search(title):
+    search_book = db.session.query(Book.id, Book.title, Book.author).filter(Book.title == title).first()
+    return jsonify(search_book)
   
 
 if __name__ == "__main__":
