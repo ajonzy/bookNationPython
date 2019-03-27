@@ -13,6 +13,30 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 # Classes go here
+class Book(db.Model):
+    __tablename__ = "book"
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(180), nullable=False)
+    spanish_title = db.Column(db.String(180), nullable=False)
+    author = db.Column(db.String(100), nullable=False)
+    cost = db.Column(db.Float, nullable=False)
+    genre = db.Column(db.String(100), nullable=False)
+    spanish_genre = db.Column(db.String(100), nullable=False)
+    summary = db.Column(db.String(), nullable=False)
+    spanish_summary = db.Column(db.String(), nullable=False)
+    # cart_items = db.relationship('Cart_item', backref='book', lazy=True)
+    # order_items = db.relationship('Order_item', backref='book', lazy=True)
+    
+    def __init__ (self, title, spanish_title, author, cost, genre, spanish_genre, summary, spanish_summary):
+        self.title = title
+        self.spanish_title = spanish_title
+        self.author = author
+        self.cost = cost
+        self.genre = genre
+        self.spanish_genre = spanish_genre
+        self.summary = summary
+        self.spanish_summary = spanish_summary
+
 class User(db.Model):
     __tablename__ ="user"
     id = db.Column(db.Integer, primary_key=True)
@@ -24,7 +48,6 @@ class User(db.Model):
     cart = db.relationship('Cart', backref='user', lazy=True)
     orders = db.relationship('Orders', backref='user', lazy=True)
 
-
     def __init__(self, name, email, password, user_type, genre_preferences):
         self.name = name
         self.email = email
@@ -34,9 +57,44 @@ class User(db.Model):
 
     def __repr__(self):
         return '<Title %r>' % self.title
-
+    
 
 # Routes go here
+@app.route('/library', methods=['GET'])
+def return_library():
+    all_books = db.session.query(Book.id, Book.title, Book.spanish_title, Book.author, Book.cost, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary).all()
+    return jsonify(all_books)
+
+@app.route('/library/input', methods=['POST'])
+def input_book():
+    if request.content_type == 'application/json':
+        post_data = request.get_json()
+        title = post_data.get('title')
+        spanish_title = post_data.get('spanish_title')
+        author = post_data.get('author')
+        cost = post_data.get('cost')
+        genre = post_data.get('genre')
+        spanish_genre = post_data.get('spanish_genre')
+        summary = post_data.get('summary')
+        spanish_summary = post_data.get('spanish_summary')
+        record = Book(title, spanish_title, author, cost, genre, spanish_genre, summary, spanish_summary)
+        db.session.add(record)
+        db.session.commit()
+        return jsonify("Data Posted")
+    return jsonify("Error adding Book")
+
+@app.route('/library/<id>', methods=["GET"])
+def return_book(id):
+    book = db.session.query(Book.title, Book.spanish_title, Book.author, Book.cost, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary).filter(Book.id == id).first()
+    return jsonify(book)
+
+@app.route('/library/delete/<id>', methods=["DELETE"])
+def delete_book(id):
+    book = db.session.query(Book).get(id)
+    db.session.delete(book)
+    db.session.commit()
+    return jsonify("Completed Delete action")
+
 @app.route('/user/input', methods=['POST'])
 def user_input():
     if request.content_type == 'application/json':
@@ -54,13 +112,10 @@ def user_input():
         return jsonify("User Posted")
     return jsonify("Something went wrong")
 
-
 @app.route('/users', methods=['GET'])
 def return_all_users():
     all_users = db.session.query(User.id, User.name, User.email, User.password, User.user_type, User.genre_preferences).all()
     return jsonify(all_users)
-
-
 
 @app.route('/delete/user/<id>', methods=["DELETE"])
 def user_delete(id):
@@ -68,9 +123,7 @@ def user_delete(id):
     db.session.delete(record)
     db.session.commit()
     return jsonify('Completed delete user')
-
-
-
+  
 
 if __name__ == "__main__":
     app.debug = True
