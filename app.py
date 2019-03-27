@@ -18,11 +18,13 @@ class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     qty = db.Column(db.Integer, nullable=False)
     total = db.Column(db.Integer, nullable=False)
-    # cartitems = ('Cart_item', backref='cart', lazy = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(user.id))
+    cartitems = ('Cart_item', backref='cart', lazy = True)
 
-    def __init__(self, qty, total):
+    def __init__(self, qty, total, user_id):
         self.qty = qty
         self.total = total
+        self.user_id = user_id
 
 # Routes go here
 
@@ -33,6 +35,7 @@ def cart_input():
        post_data = request.get_json()
        qty = post_data.get('qty')
        total = post_data.get('total')
+       user_id = post_data.get("user_id")
        rec = Cart(qty, total)
        db.session.add(rec)    
        db.session.commit()
@@ -43,12 +46,12 @@ def cart_input():
 
 @app.route('/carts', methods=['GET'])
 def return_carts():
-    all_carts = db.session.query(Cart.qty, Cart.total).all()
+    all_carts = db.session.query(Cart.id, Cart.qty, Cart.total, Cart.user_id).all()
     return jsonify(all_carts)
 
 @app.route('/cart/<id>', methods=['GET'])
 def return_single_cart(id):
-    one_cart = db.session.query(Cart.qty, Cart.total).filter(Cart.id == id).first()
+    one_cart = db.session.query(Cart.id, Cart.qty, Cart.total, Cart.user_id).filter(Cart.id == id).first()
     return jsonify(one_cart)
 
 
