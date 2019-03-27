@@ -13,9 +13,26 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 # Classes go here
+class User(db.Model):
+    __tablename__ ="user"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120))
+    email = db.Column(db.String(120))
+    password = db.Column(db.String(80))
+    genre_preferences = db.Column(db.String(80) nullable=True)
+
+    def __init__(self, name, email, password, genre_preferences):
+        self.name = name
+        self.email = email
+        self.password = password
+        self.genre_preferences = genre_preferences
+
+    def __repr__(self):
+        return '<Title %r>' % self.title
 
 
 # Routes go here
+
 
 
 if __name__ == "__main__":
