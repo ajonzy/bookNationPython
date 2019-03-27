@@ -177,6 +177,22 @@ def return_all_users():
     all_users = db.session.query(User.id, User.name, User.email, User.password, User.user_type, User.genre_preferences).all()
     return jsonify(all_users)
 
+@app.route("/users/verification", methods=["POST"])
+def user_verification():
+    if request.content_type == "application/json":
+        post_data = request.get_json()
+        user_password = post_data.get("password")
+        check_email = db.session.query(User.email).filter(User.email == post_data.get("email")).first()
+        if check_email is None:
+            return jsonify("User NOT Verified")
+        valid_password = db.session.query(User.password).filter(User.password == post_data.get("password")).first()
+        if valid_password is None:
+            return jsonify("User NOT Verified")
+        if user_password != valid_password:
+            return jsonify("User NOT Verified")
+        return jsonify("User Verified")
+    return jsonify("Error verifying user")
+
 
 @app.route('/cart/input', methods = ['POST'])
 def cart_input():
