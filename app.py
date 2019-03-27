@@ -13,7 +13,31 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 # Classes go here
+class Book(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(40), nullable=False)
+    spanish_title = db.Column(db.String(40), nullable=False)
+    author = db.Column(db.String(40), nullable=False)
+    cost = db.Column(db.Float, nullable=False)
+    genre = db.Column(db.String(40), nullable=False)
+    spanish_genre = db.Column(db.String(40), nullable=False)
+    summary = db.Column(db.String(5000), nullable=False)
+    spanish_summary = db.Column(db.String(5000), nullable=False)
+    cart_item = db.relationship('Cart_item', backref='book', lazy=True)
 
+    def __init__ (self, title, spanish_title, author, cost, genre, spanish_genre, summary, spanish_summary, cart_item):
+        self.title = title
+        self.spanish_title = spanish_title
+        self.author = author
+        self.cost = cost
+        self.genre = genre
+        self.spanish_genre = spanish_genre
+        self.summary = summary
+        self.spanish_summary = spanish_summary
+        self.cart_item = cart_item
+
+
+    
 
 # Routes go here
 
