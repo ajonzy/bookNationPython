@@ -79,16 +79,44 @@ class Book(db.Model):
         return '<Title %r>' % self.title
 
 
-
 class Cart_item(db.Model):
     __tablename__="cart_item"
     id = db.Column(db.Integer, primary_key=True)
     # cart_id = db.Column(db.Integer, db.ForeignKey(Cart.id))
     # book_id = db.Column(db.Integer, db.ForeignKey(Book.id))
-
-    def __repr__(self):
-        return '<Title %r>' % self.title
     
+    def __init__(self, cart_id, book_id):
+      self.cart_id = cart_id
+      self.book_id = book_id
+
+# Order
+class Order(db.Model):
+    __tablename__ ="order"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.String(120), nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    order_items = db.relationship('Order_item', backref='order', lazy=True)
+    
+
+    def __init__(self, user_id, date, total):
+        self.user_id = user_id
+        self.date = date
+        self.total = total
+
+
+class Order_item(db.Model):
+    __tablename__ ="order_item"
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
+    
+
+    def __init__(self, order_id, book_id):
+        self.order_id = order_id
+        self.book_id = book_id
+
+
 
 # Routes go here
 @app.route('/library', methods=['GET'])
@@ -191,11 +219,46 @@ def user_delete(id):
     db.session.commit()
     return jsonify('Completed delete user')
 
+@app.route('/single/user/<id>', methods=["GET"])
+def return_single_user(id):
+    single_user = db.session.query(User.id, User.name, User.email, User.password, User.user_type, User.genre_preferences).filter(User.id == id).first()
+    return jsonify(single_user)
+
+
+# Order Routes
+@app.route('/order/input', methods = ['POST'])
+def order_input():
+    if request.content_type == 'application/json':
+       post_data = request.get_json()
+       user_id = post_data.get("user_id")
+       date = post_data.get('date')
+       total = post_data.get('total')
+       rec = Order(user_id, date, total)
+       db.session.add(rec)    
+       db.session.commit()
+       return jsonify("Order Posted")
+    return jsonify('Something went wrong')
+
+
+@app.route('/orders', methods=['GET'])
+def return_orders():
+    all_orders = db.session.query(Order.id, Order.user_id, Order.date, Order.total).all()
+    return jsonify(all_orders)
+
+
+@app.route('/delete/order/<id>', methods=["DELETE"])
+def order_delete(id):
+    record = db.session.query(Order).get(id)
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify('Completed delete Order')
+
 
 @app.route('/search/<title>', methods=['GET'])
 def book_search(title):
     search_book = db.session.query(Book.id, Book.title, Book.author).filter(Book.title == title).first()
     return jsonify(search_book)
+
   
 
 if __name__ == "__main__":
