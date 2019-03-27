@@ -13,9 +13,56 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 # Classes go here
+class Cart(db.Model):
+    __tablename__ = "cart"
+    id = db.Column(db.Integer, primary_key=True)
+    qty = db.Column(db.Integer, nullable=False)
+    total = db.Column(db.Integer, nullable=False)
+    # cartitems = ('Cart_item', backref='cart', lazy = True)
 
+    def __init__(self, qty, total):
+        self.qty = qty
+        self.total = total
 
 # Routes go here
+
+#post
+@app.route('/cart/input', methods = ['POST'])
+def cart_input():
+    if request.content_type == 'application/json':
+       post_data = request.get_json()
+       qty = post_data.get('qty')
+       total = post_data.get('total')
+       rec = Cart(qty, total)
+       db.session.add(rec)    
+       db.session.commit()
+       return jsonify("Data Posted")
+
+    return jsonify('Something went wrong')
+#get
+
+@app.route('/carts', methods=['GET'])
+def return_carts():
+    all_carts = db.session.query(Cart.qty, Cart.total).all()
+    return jsonify(all_carts)
+
+@app.route('/cart/<id>', methods=['GET'])
+def return_single_cart(id):
+    one_cart = db.session.query(Cart.qty, Cart.total).filter(Cart.id == id).first()
+    return jsonify(one_cart)
+
+
+#delete
+
+@app.route('/cart/delete/<id>', methods=["DELETE"])
+def cart_delete(id):
+    if request.content_type == 'application/json':
+       
+        record = db.session.query(Cart).get(id)
+        db.session.delete(record)
+        db.session.commit()
+        return jsonify("Completed Delete action")
+    return jsonify("delete failed")
 
 
 if __name__ == "__main__":
