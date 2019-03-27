@@ -22,8 +22,8 @@ class User(db.Model):
     password = db.Column(db.String(), nullable=False)
     user_type = db.Column(db.String(80), nullable=False)
     genre_preferences = db.Column(db.String(80), nullable=True)
-    # cart = db.relationship('Cart', backref='user', lazy=True)
-    # orders = db.relationship('Orders', backref='user', lazy=True)
+    cart = db.relationship('Cart', backref='user', lazy=True)
+    orders = db.relationship('Order', backref='user', lazy=True)
 
     def __init__(self, name, email, password, user_type, genre_preferences):
         self.name = name
@@ -42,7 +42,7 @@ class Cart(db.Model):
     qty = db.Column(db.Integer, nullable=False)
     total = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    # cart_items = db.relationship('Cart_item', backref='cart', lazy = True)
+    cart_items = db.relationship('Cart_item', backref='cart', lazy = True)
 
     def __init__(self, qty, total, user_id):
         self.qty = qty
@@ -61,8 +61,8 @@ class Book(db.Model):
     spanish_genre = db.Column(db.String(100), nullable=False)
     summary = db.Column(db.String(), nullable=False)
     spanish_summary = db.Column(db.String(), nullable=False)
-    # cart_items = db.relationship('Cart_item', backref='book', lazy=True)
-    # order_items = db.relationship('Order_item', backref='book', lazy=True)
+    cart_items = db.relationship('Cart_item', backref='book', lazy=True)
+    order_items = db.relationship('Order_item', backref='book', lazy=True)
     
     def __init__ (self, title, spanish_title, author, cost, cover_url, genre, spanish_genre, summary, spanish_summary):
         self.title = title
@@ -82,8 +82,8 @@ class Book(db.Model):
 class Cart_item(db.Model):
     __tablename__="cart_item"
     id = db.Column(db.Integer, primary_key=True)
-    # cart_id = db.Column(db.Integer, db.ForeignKey(Cart.id))
-    # book_id = db.Column(db.Integer, db.ForeignKey(Book.id))
+    cart_id = db.Column(db.Integer, db.ForeignKey(Cart.id))
+    book_id = db.Column(db.Integer, db.ForeignKey(Book.id))
     
     def __init__(self, cart_id, book_id):
       self.cart_id = cart_id
@@ -93,7 +93,7 @@ class Cart_item(db.Model):
 class Order(db.Model):
     __tablename__ ="order"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
     date = db.Column(db.String(120), nullable=False)
     total = db.Column(db.Float, nullable=False)
     order_items = db.relationship('Order_item', backref='order', lazy=True)
