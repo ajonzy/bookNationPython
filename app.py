@@ -121,7 +121,7 @@ class Order_item(db.Model):
 # Routes go here
 @app.route('/library', methods=['GET'])
 def return_library():
-    all_books = db.session.query(Book.id, Book.title, Book.spanish_title, Book.author, Book.cost, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary).all()
+    all_books = db.session.query(Book.id, Book.title, Book.spanish_title, Book.author, Book.cost, Book.cover_url, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary).all()
     return jsonify(all_books)
 
 @app.route('/library/input', methods=['POST'])
