@@ -41,7 +41,7 @@ class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     qty = db.Column(db.Integer, nullable=False)
     total = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     cart_items = db.relationship('Cart_item', backref='cart', lazy = True)
 
     def __init__(self, qty, total, user_id):
@@ -82,8 +82,8 @@ class Book(db.Model):
 class Cart_item(db.Model):
     __tablename__="cart_item"
     id = db.Column(db.Integer, primary_key=True)
-    cart_id = db.Column(db.Integer, db.ForeignKey(Cart.id))
-    book_id = db.Column(db.Integer, db.ForeignKey(Book.id))
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'))
+    book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
     
     def __init__(self, cart_id, book_id):
       self.cart_id = cart_id
@@ -93,7 +93,7 @@ class Cart_item(db.Model):
 class Order(db.Model):
     __tablename__ ="order"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     date = db.Column(db.String(120), nullable=False)
     total = db.Column(db.Float, nullable=False)
     order_items = db.relationship('Order_item', backref='order', lazy=True)
