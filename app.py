@@ -146,7 +146,7 @@ def input_book():
 
 @app.route('/library/<id>', methods=["GET"])
 def return_book(id):
-    book = db.session.query(Book.title, Book.spanish_title, Book.author, Book.cost, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary).filter(Book.id == id).first()
+    book = db.session.query(Book.title, Book.spanish_title, Book.author, Book.cost, Book.cover_url, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary).filter(Book.id == id).first()
     return jsonify(book)
 
 @app.route('/library/delete/<id>', methods=["DELETE"])
