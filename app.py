@@ -299,7 +299,27 @@ def book_search(title):
     print(search_book)
     return jsonify(search_book)
 
-  
+
+
+@app.route('/cart_item/input', methods = ['POST'])
+def cart_item_input():
+    if request.content_type == 'application/json':
+       post_data = request.get_json()
+
+       cart_id = post_data.get("cart_id")
+       book_id = post_data.get('book_id')
+
+       rec = Cart_item(cart_id, book_id)
+       db.session.add(rec)    
+       db.session.commit()
+       return jsonify("Order Posted")
+    return jsonify('Something went wrong')
+
+
+@app.route('/cart_items', methods=['GET'])
+def return_cart_items():
+    all_cart_items = db.session.query(Cart_item).all()
+    return jsonify(all_cart_items)
 
 if __name__ == "__main__":
     app.debug = True
