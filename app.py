@@ -219,6 +219,11 @@ def return_single_cart(id):
     one_cart = db.session.query(Cart.id, Cart.qty, Cart.total, Cart.user_id).filter(Cart.id == id).first()
     return jsonify(one_cart)
 
+@app.route("/cart/user/<user_id>", methods=["GET"])
+def return_cart_by_user(user_id):
+    one_cart = db.session.query(Cart.id, Cart.qty, Cart.total).filter(Cart.user_id == user_id).first()
+    return jsonify(one_cart)
+
 @app.route('/cart/delete/<id>', methods=["DELETE"])
 def cart_delete(id):
     if request.content_type == 'application/json':
