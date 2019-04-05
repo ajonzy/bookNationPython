@@ -164,7 +164,7 @@ def user_input():
         name = post_data.get('name')
         email = post_data.get('email')
         password = post_data.get('password')
-        user_type = post_data.get('user_type')
+        user_type = 'user'
         genre_preferences = post_data.get('genre_preferences')
         
         reg = User(name, email, password, user_type, genre_preferences)
@@ -240,6 +240,11 @@ def user_delete(id):
 def return_single_user(id):
     single_user = db.session.query(User.id, User.name, User.email, User.password, User.user_type, User.genre_preferences).filter(User.id == id).first()
     return jsonify(single_user)
+
+@app.route('/single/email/user/<email>', methods=["GET"])
+def return_single_user_by_email(email):
+    single_user_by_email = db.session.query(User.id, User.name, User.email, User.password, User.user_type, User.genre_preferences).filter(User.email == email).first()
+    return jsonify(single_user_by_email)
 
 
 # Order Routes
