@@ -189,7 +189,7 @@ def user_verification():
         check_email = db.session.query(User.email).filter(User.email == post_data.get("email")).first()
         if check_email is None:
             return jsonify("User NOT Verified")
-        valid_password = db.session.query(User.password).filter(User.password == post_data.get("password")).first()
+        valid_password = db.session.query(User.password).filter(User.email == post_data.get("email")).first()[0]
         if valid_password is None:
             return jsonify("User NOT Verified")
         if user_password != valid_password:
