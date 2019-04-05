@@ -294,8 +294,9 @@ def order_delete(id):
 
 @app.route('/search/<title>', methods=['GET'])
 def book_search(title):
-    search_book = db.session.query(Book.id, Book.title, Book.spanish_title, Book.author, Book.cost, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary ).filter(Book.title == title.title()).first()
-
+    print(title)
+    search_book = db.session.query(Book.id, Book.title, Book.spanish_title, Book.author, Book.cost, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary ).filter(Book.title == (title.title())).first()
+    print(search_book)
     return jsonify(search_book)
 
   
