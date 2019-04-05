@@ -170,6 +170,12 @@ def user_input():
         reg = User(name, email, password, user_type, genre_preferences)
         db.session.add(reg)
         db.session.commit()
+
+        qty = 0
+        total = 0
+        record = Cart(qty, total)
+        db.session.add(record)
+        db.session.commit()
         return jsonify("User Posted")
     return jsonify("Something went wrong")
 
