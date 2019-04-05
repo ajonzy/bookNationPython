@@ -230,6 +230,11 @@ def return_cart_by_user(user_id):
     one_cart = db.session.query(Cart.id, Cart.qty, Cart.total).filter(Cart.user_id == user_id).first()
     return jsonify(one_cart)
 
+@app.route("/cart_items/cart/<cart_id>")
+def get_cart_items_by_cart(cart_id):
+    cart_items = db.session.query(Cart_item.book_id).filter(Cart_item.cart_id == cart_id).all()
+    return jsonify(cart_items)
+
 @app.route('/cart/delete/<id>', methods=["DELETE"])
 def cart_delete(id):
     if request.content_type == 'application/json':
@@ -289,7 +294,7 @@ def order_delete(id):
 
 @app.route('/search/<title>', methods=['GET'])
 def book_search(title):
-    search_book = db.session.query(Book.id, Book.title, Book.spanish_title, Book.author, Book.cost, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary ).filter(Book.title == title).first()
+    search_book = db.session.query(Book.id, Book.title, Book.spanish_title, Book.author, Book.cost, Book.genre, Book.spanish_genre, Book.summary, Book.spanish_summary ).filter(Book.title == title.title()).first()
 
     return jsonify(search_book)
 
